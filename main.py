@@ -1,63 +1,96 @@
 import requests
 import tkinter as tk
+from datetime import datetime
 
-# API details
 API_KEY = "b9504f3d4e4ce7e7c9464542c56e6c53"
 
-# getting weather for searched city
+forecast_data = []
+current_page = 0
+
 def get_weather():
-
-
-    # clear old results 
-    for widget in result_frame.winfo_children():
-        widget.destroy()
-
+    global forecast_data, current_page
     city = city_entry.get()
     if not city:
-        tk.Label(result_frame, text="Please enter a city", fg="red", bg="lightblue").pack()
+        story_label.config(text="⚠️ Please enter a city")
         return
 
-    URL = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    URL = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
     response = requests.get(URL)
 
     if response.status_code == 200:
         data = response.json()
+        forecast_data = []
 
-        city_name = data["name"]
-        temperature = data["main"]["temp"]
-        weather_desc = data["weather"][0]["description"]
-        humidity = data["main"]["humidity"]
-        wind_speed = data["wind"]["speed"]
+        # pick forecast at 12:00 for each day
+        for entry in data["list"]:
+            time = entry["dt_txt"]
+            if "12:00:00" in time:
+                date = datetime.strptime(time, "%Y-%m-%d %H:%M:%S").strftime("%a, %d %b")
+                temp = entry["main"]["temp"]
+                desc = entry["weather"][0]["description"].capitalize()
+                humidity = entry["main"]["humidity"]
+                wind = entry["wind"]["speed"]
 
-        # Create new labels inside result_frame
-        tk.Label(result_frame, text=f"Weather in {city_name}", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
-        tk.Label(result_frame, text=f"Temperature: {temperature}°C", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
-        tk.Label(result_frame, text=f"Condition: {weather_desc}", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
-        tk.Label(result_frame, text=f"Humidity: {humidity}%", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
-        tk.Label(result_frame, text=f"Wind Speed: {wind_speed} m/s", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
+                forecast_data.append(
+                    f"📅 {date}\n\n🌡️ {temp}°C\n🌤️ {desc}\n\n💧 Humidity: {humidity}%\n💨 Wind: {wind} m/s"
+                )
 
+        current_page = 0
+        show_page()
     else:
-        tk.Label(result_frame, text="City not found or API error", fg="red", bg="lightblue").pack()
+        story_label.config(text="❌ City not found or API error")
+
+def show_page():
+    if forecast_data:
+        story_label.config(text=forecast_data[current_page])
+
+def next_page():
+    global current_page
+    if forecast_data and current_page < len(forecast_data) - 1:
+        current_page += 1
+        show_page()
+
+def prev_page():
+    global current_page
+    if forecast_data and current_page > 0:
+        current_page -= 1
+        show_page()
 
 
 # Tkinter window
 window = tk.Tk()
-window.title("Weather App")
-window.geometry("400x400")
-window.configure(bg="lightblue")
+window.title("Weather Stories")
+window.geometry("400x600")
+window.configure(bg="black")
 
-# Search box
-city_entry = tk.Entry(window, width=25, font=("Arial", 12))
-city_entry.pack(pady=10)
+# Search bar
+city_entry = tk.Entry(window, width=25, font=("Arial", 14))
+city_entry.pack(pady=15)
 
-# Enter key = search
 city_entry.bind("<Return>", lambda event: get_weather())
-
 search_button = tk.Button(window, text="Search", command=get_weather)
-search_button.pack(pady=5)
+search_button.pack()
 
-# Frame to hold all results
-result_frame = tk.Frame(window, bg="lightblue")
-result_frame.pack(pady=10, fill="both", expand=True)
+# Story-style display
+story_label = tk.Label(
+    window,
+    text="🔍 Search for a city",
+    font=("Arial", 20, "bold"),
+    fg="white",
+    bg="black",
+    justify="center",
+    wraplength=350
+)
+story_label.pack(expand=True)
+
+# Navigation buttons
+frame = tk.Frame(window, bg="black")
+frame.pack(pady=10)
+
+prev_button = tk.Button(frame, text="⬅️ Prev", command=prev_page)
+prev_button.grid(row=0, column=0, padx=10)
+
+next_button = tk.Button(frame, text="Next ➡️", command=next_page)
+next_button.grid(row=0, column=1, padx=10)
 
 window.mainloop()
