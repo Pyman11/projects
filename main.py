@@ -6,9 +6,15 @@ API_KEY = "b9504f3d4e4ce7e7c9464542c56e6c53"
 
 # getting weather for searched city
 def get_weather():
+
+
+    # clear old results 
+    for widget in result_frame.winfo_children():
+        widget.destroy()
+
     city = city_entry.get()
     if not city:
-        result_label.config(text="Please enter a city")
+        tk.Label(result_frame, text="Please enter a city", fg="red", bg="lightblue").pack()
         return
 
     URL = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
@@ -23,15 +29,15 @@ def get_weather():
         humidity = data["main"]["humidity"]
         wind_speed = data["wind"]["speed"]
 
-        # Update labels
-        city_label.config(text=f"Weather in {city_name}")
-        temp_label.config(text=f"Temperature: {temperature}°C")
-        condition_label.config(text=f"Condition: {weather_desc}")
-        humidity_label.config(text=f"Humidity: {humidity}%")
-        wind_label.config(text=f"Wind Speed: {wind_speed} m/s")
+        # Create new labels inside result_frame
+        tk.Label(result_frame, text=f"Weather in {city_name}", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
+        tk.Label(result_frame, text=f"Temperature: {temperature}°C", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
+        tk.Label(result_frame, text=f"Condition: {weather_desc}", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
+        tk.Label(result_frame, text=f"Humidity: {humidity}%", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
+        tk.Label(result_frame, text=f"Wind Speed: {wind_speed} m/s", bg="white", font=("Arial", 12)).pack(pady=5, fill="x")
 
     else:
-        result_label.config(text="City not found or API error")
+        tk.Label(result_frame, text="City not found or API error", fg="red", bg="lightblue").pack()
 
 
 # Tkinter window
@@ -44,47 +50,14 @@ window.configure(bg="lightblue")
 city_entry = tk.Entry(window, width=25, font=("Arial", 12))
 city_entry.pack(pady=10)
 
-#enter key = search
+# Enter key = search
 city_entry.bind("<Return>", lambda event: get_weather())
-
 
 search_button = tk.Button(window, text="Search", command=get_weather)
 search_button.pack(pady=5)
 
-# Frames for each info block
-city_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-city_frame.pack(pady=5, fill="x")
-
-temp_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-temp_frame.pack(pady=5, fill="x")
-
-condition_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-condition_frame.pack(pady=5, fill="x")
-
-humidity_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-humidity_frame.pack(pady=5, fill="x")
-
-wind_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-wind_frame.pack(pady=5, fill="x")
-
-# Labels inside frames
-city_label = tk.Label(city_frame, text="Weather info will appear here", bg="white", font=("Arial", 12))
-city_label.pack()
-
-temp_label = tk.Label(temp_frame, text="", bg="white", font=("Arial", 12))
-temp_label.pack()
-
-condition_label = tk.Label(condition_frame, text="", bg="white", font=("Arial", 12))
-condition_label.pack()
-
-humidity_label = tk.Label(humidity_frame, text="", bg="white", font=("Arial", 12))
-humidity_label.pack()
-
-wind_label = tk.Label(wind_frame, text="", bg="white", font=("Arial", 12))
-wind_label.pack()
-
-# Result label (for errors)
-result_label = tk.Label(window, text="", bg="lightblue", fg="red", font=("Arial", 10))
-result_label.pack(pady=5)
+# Frame to hold all results
+result_frame = tk.Frame(window, bg="lightblue")
+result_frame.pack(pady=10, fill="both", expand=True)
 
 window.mainloop()
