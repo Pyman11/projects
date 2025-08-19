@@ -4,7 +4,7 @@ import tkinter as tk
 # API details
 API_KEY = "b9504f3d4e4ce7e7c9464542c56e6c53"
 
-# Function to fetch weather
+# getting weather for searched city
 def get_weather():
     city = city_entry.get()
     if not city:
@@ -26,7 +26,7 @@ def get_weather():
         # Update labels
         city_label.config(text=f"Weather in {city_name}")
         temp_label.config(text=f"Temperature: {temperature}°C")
-        cond_label.config(text=f"Condition: {weather_desc}")
+        condition_label.config(text=f"Condition: {weather_desc}")
         humidity_label.config(text=f"Humidity: {humidity}%")
         wind_label.config(text=f"Wind Speed: {wind_speed} m/s")
 
@@ -54,8 +54,8 @@ city_frame.pack(pady=5, fill="x")
 temp_frame = tk.Frame(window, bg="white", padx=10, pady=5)
 temp_frame.pack(pady=5, fill="x")
 
-cond_frame = tk.Frame(window, bg="white", padx=10, pady=5)
-cond_frame.pack(pady=5, fill="x")
+condition_frame = tk.Frame(window, bg="white", padx=10, pady=5)
+condition_frame.pack(pady=5, fill="x")
 
 humidity_frame = tk.Frame(window, bg="white", padx=10, pady=5)
 humidity_frame.pack(pady=5, fill="x")
@@ -70,8 +70,8 @@ city_label.pack()
 temp_label = tk.Label(temp_frame, text="", bg="white", font=("Arial", 12))
 temp_label.pack()
 
-cond_label = tk.Label(cond_frame, text="", bg="white", font=("Arial", 12))
-cond_label.pack()
+condition_label = tk.Label(condition_frame, text="", bg="white", font=("Arial", 12))
+condition_label.pack()
 
 humidity_label = tk.Label(humidity_frame, text="", bg="white", font=("Arial", 12))
 humidity_label.pack()
