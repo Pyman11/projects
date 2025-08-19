@@ -44,6 +44,10 @@ window.configure(bg="lightblue")
 city_entry = tk.Entry(window, width=25, font=("Arial", 12))
 city_entry.pack(pady=10)
 
+#enter key = search
+city_entry.bind("<Return>", lambda event: get_weather())
+
+
 search_button = tk.Button(window, text="Search", command=get_weather)
 search_button.pack(pady=5)
 
